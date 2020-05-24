@@ -1,0 +1,27 @@
+﻿
+@{
+    ViewBag.Title = "UploadImage";
+}
+
+<h1>Upload Image files</h1>
+<script src="~/Scripts/dropzone/dropzone.min.js"></script>
+<link href="~/Scripts/dropzone/dropzone.min.css" rel="stylesheet" />
+<div class="jumbotron">
+    <form action="#" class="dropzone" id="dropzoneJsForm" style="background-color:#00BFFF">
+        <input type="hidden" name="ProjectID" value="@Request.Url.Segments.Last()" />
+    </form>
+</div>
+<div>
+    @Html.ActionLink("Back to Project", "Details", new { id = Request.Url.Segments.Last() })
+</div>
+@section Scripts{
+    <script>
+        Dropzone.options.dropzoneForm = {
+            init: function () {
+                this.on("complete", function (data) {
+                    var res = JSON.parse(data.xhr.responseText);
+                });
+            }
+        };
+    </script>
+}

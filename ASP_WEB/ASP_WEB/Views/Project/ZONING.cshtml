@@ -1,0 +1,258 @@
+﻿@model ASP_WEB.Models.Zoning
+@{
+    ViewBag.Title = "ZONING";
+    ASP_WEB.Models.Zoning zoning = Model;
+}
+<link href="~/Content/imgAreaSelect/imgareaselect-animated.css" rel="stylesheet" />
+<link href="~/Content/imgAreaSelect/imgareaselect-default.css" rel="stylesheet" />
+<link href="~/Content/imgAreaSelect/imgareaselect-deprecated.css" rel="stylesheet" />
+<h2>ZONING</h2>
+<hr />
+<form method="post"  enctype="multipart/form-data">
+    @Html.ValidationSummary()
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-3">
+                <label>Fields</label>
+                <select id="fieldSet" class="form-control">
+                    @for (int i = 0; i < zoning.FieldNum; i++)
+                    {
+                        var FieldNote = zoning.FieldNote[i];
+                        var NoteName = FieldNote.Replace(' ', '_');
+                        <option value="@NoteName">@FieldNote</option>
+                    }
+                </select>
+                <div class="row">
+                    @for (int i = 0; i < zoning.FieldNum; i++)
+                    {
+                        var FieldNote = zoning.FieldNote[i];
+                        var NoteName = FieldNote.Replace(' ', '_');
+                        if (zoning.CheckBox[i] == "1")
+                        {
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label>@FieldNote: </label>
+                                        <input type="checkbox" id="@NoteName" class="form-control zoning" />
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label>@FieldNote-1: </label>
+                                        <input type="checkbox" id="@NoteName-1" class="form-control zoning-1" />
+                                    </div>
+                                </div>
+                                
+                            </div>
+                        }
+                        else
+                        {
+                            var max = zoning.MaxChar[i];
+                            var Alpha = zoning.Alpha[i];
+                            var Num = zoning.Num[i];
+                            var Dot = zoning.Dot[i];
+                            var Special = zoning.Special[i];
+                            var Custom = zoning.Custom[i];
+                            var Abbr = zoning.Abbr[i];
+                            var FullView = zoning.FullView!=null?zoning.FullView[i]:"";
+                            var FieldView = zoning.FieldView!=null? zoning.FieldView[i] : "";
+
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <label for="@NoteName">@FieldNote: </label>
+                                    <input type="text" id="@NoteName" maxlength="@max"
+                                           data-Alpha="@Alpha"
+                                           data-Num="@Num"
+                                           data-Dot="@Dot"
+                                           data-Special="@Special"
+                                           data-Custom="@Custom"
+                                           data-Abbr="@Abbr"
+                                           class="form-control zoning" value="@FullView"/>
+                                </div>
+                                <div class="col-sm-6">
+                                    <label>@FieldNote-1: </label>
+                                    <input type="text" id="@NoteName-1" maxlength="@max"
+                                           data-Alpha="@Alpha"
+                                           data-Num="@Num"
+                                           data-Dot="@Dot"
+                                           data-Special="@Special"
+                                           data-Custom="@Custom"
+                                           data-Abbr="@Abbr"
+                                           class="form-control zoning-1" value="@FieldView"/>
+                                </div>
+
+                            </div>
+                        }
+
+                    }
+                </div>
+            </div>
+            <div class="col-lg-9">
+                <div class="row">
+                    <div class="col-md-4">
+                        <button id="setFull" class="btn btn-default">Set Full View</button>
+                    </div>
+                    <div class="col-md-4">
+                        <button id="setField" class="btn btn-default">Set Field View</button>
+                    </div>
+                </div>
+                <img id="ImgPreview" src="@zoning.ZoningFile"/>
+                <div class="row">
+                    Select the image <input type="file" id="ImgUpload" name="ImgUpload" onchange="ImgPre(this)" class="btn btn-block" />
+                </div>
+                <div class="row">
+                    <div class="col-md-2">
+                        X:<input type="text" id="x" value="" style="width: 50px;text-align: center;" />
+                    </div>
+                    <div class="col-md-2">
+                        Y:<input type="text" id="y" value="" style="width: 50px;text-align: center;" />
+                    </div>
+                    <div class="col-md-2">
+                        Width:<input type="text" id="w" value="" style="width: 50px;text-align: center;" />
+                    </div>
+                    <div class="col-md-2">
+                        Height:<input type="text" id="h" value="" style="width: 50px;text-align: center;" />
+                    </div>
+                </div>
+                <input type="hidden" value="@zoning.config.ProjectID" name="ProjectID"/>
+                <input type="hidden" value="" name="FullView"/>
+                <input type="hidden" value="" name="FieldView"/>
+            </div>
+        </div>
+    </div>
+    <button type="submit" id="update" class="btn btn-success">Submit</button>
+</form>
+<div>
+    @Html.ActionLink("Back to Project", "Details", new { id = zoning.config.ProjectID })
+</div>
+@section Scripts{
+    <script src="~/Scripts/jquery.validate.min.js"></script>
+    <script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+    <script src="~/Scripts/imgAreaSelect/jquery.imgareaselect.min.js"></script>
+    <script src="~/Scripts/imgAreaSelect/jquery.imgareaselect.pack.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#ImgPreview').imgAreaSelect({
+                handles: true,
+                onSelectEnd: function (img, selection) {
+                    if (!selection.width || !selection.height) {
+                        return;
+                    }
+                    $('#x').val(selection.x1);
+                    $('#y').val(selection.y1);
+                    $('#w').val(selection.width);
+                    $('#h').val(selection.height);
+                }
+            });
+
+            $('#setFull').click(function (e) {
+                e.preventDefault();
+                var v = $('#x').val() + ',' +
+                    $('#y').val() + ',' +
+                    $('#w').val() + ',' +
+                    $('#h').val();
+                var field = $('#fieldSet').val();
+                $('#' + field).val(v);
+            });
+            $('#setField').click(function (e) {
+                e.preventDefault();
+                var v = $('#x').val() + ',' +
+                    $('#y').val() + ',' +
+                    $('#w').val() + ',' +
+                    $('#h').val();
+                var field = $('#fieldSet').val();
+                $('#' + field + '-1').val(v);
+            });
+            $('#update').click(function () {
+                var full = '';
+                $('input.zoning').each(function (i, em) {
+                    full += $(this).val() + '|';
+                });
+                var field = '';
+                $('input.zoning-1').each(function (i, em) {
+                    field += $(this).val() + '|';
+                });
+                field = field.slice(0, -1);
+                full = full.slice(0, -1);
+                $('input[name="FullView"]').val(full);
+                $('input[name="FieldView"]').val(field);
+            });
+            $('input[type="text"]').keyup(function () {
+                var alpha = $(this).data('alpha');
+                var num = $(this).data('num');
+                var dot = $(this).data('dot');
+                var special = $(this).data('special');
+                var custom = $(this).data('custom');
+                var abbr = $(this).data('abbr');
+                var v = $(this).val();
+
+                var reg = /[a-zA-Z]/;
+                if (alpha == '0') {
+                    if (checkValid(v, reg)) {
+                        alert('Dont input Alphabet');
+                        return;
+                    }
+                }
+
+                reg = /[0-9]/;
+                if (num == '0') {
+                    if (checkValid(v, reg)) {
+                        alert('Dont input Number');
+                        return;
+                    }
+                }
+                reg = /[.,\/]/;
+                if (dot == '0') {
+                    if (checkValid(v, reg)) {
+                        alert('Dont input (.,/)');
+                        return;
+                    }
+                }
+                reg = /[^\w\*]/;
+                if (special == '0') {
+                    if (checkValid(v, reg)) {
+                        alert('Dont input special charater');
+                        return;
+                    }
+                }
+                //reg = /[.,\/]/;
+                //if (custom == '0') {
+                //    if (checkValid(v, reg)) {
+                //        alert('Dont input custom charater');
+                //        return;
+                //    }
+                //}
+
+                //reg = /[.,\/]/;
+                //if (abbr == '0') {
+                //    if (checkValid(v, reg)) {
+                //        alert('Dont input abbr charater');
+                //        return;
+                //    }
+                //}
+            });
+        });
+        function validateEmail(emailField) {
+            var reg = /^([A-Za-z0-9_\-\.])+\([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
+            if (reg.test(emailField) == false) {
+                alert('Invalid Email Address');
+                return false;
+            }
+            return true;
+        }
+        function checkValid(v, reg) {
+            if (reg.test(v) == false) {
+                return false;
+            }
+            return true;
+        }
+        function ImgPre(input) {
+            if (input.files[0]) {
+                var uploadimg = new FileReader();
+                uploadimg.onload = function (displayimg) {
+                    $("#ImgPreview").attr('src', displayimg.target.result);
+                }
+                uploadimg.readAsDataURL(input.files[0]);
+            }
+        }
+
+    </script>
+}

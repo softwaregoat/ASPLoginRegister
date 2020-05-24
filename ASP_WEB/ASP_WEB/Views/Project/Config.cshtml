@@ -1,0 +1,248 @@
+﻿@model ASP_WEB.Models.Config
+@{
+    ViewBag.Title = "Config";
+    ASP_WEB.Models.Config config = new ASP_WEB.Models.Config();
+    if (Model!=null)
+    {
+        config = Model;
+    }
+}
+<h1>ProjectName Configuration</h1>
+<hr />
+@using (Html.BeginForm("EditConfig", "Project", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+
+<div class="form-horizontal">
+
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+    <input type="hidden" id="ProjectID" name="ProjectID" value="@Request.Url.Segments.Last()" />
+
+    <div class="row">
+        <h5>How many fields will this project need? </h5>
+        <input type="number" id="FieldNum" name="FieldNum" value="@config.FieldNum"/>
+        <button class="btn btn-default" id="apply">APPLY</button>
+    </div>
+    <hr />
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>MaxChar</th>
+                <th>FieldNote</th>
+                <th>IsCheckBox</th>
+                <th>Allow Alpha</th>
+                <th>Allow Number</th>
+                <th>Allow Dot</th>
+                <th>Allow Special</th>
+                <th>Allow Custom</th>
+                <th>Allow Abbre</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+    <input type="hidden" id="MaxChar" name="MaxChar" value="@config.MaxChar"/>
+    <input type="hidden" id="FieldNote" name="FieldNote" value="@config.FieldNote"/>
+    <input type="hidden" id="CheckBox" name="CheckBox" value="@config.CheckBox"/>
+    <input type="hidden" id="Alpha" name="Alpha" value="@config.Alpha"/>
+    <input type="hidden" id="Num" name="Num" value="@config.Num"/>
+    <input type="hidden" id="Dot" name="Dot" value="@config.Dot" />
+    <input type="hidden" id="Special" name="Special" value="@config.Special"/>
+    <input type="hidden" id="Custom" name="Custom" value="@config.Custom"/>
+    <input type="hidden" id="Abbr" name="Abbr" value="@config.Abbr"/>
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10">
+            <input type="submit" value="Create" id="create" class="btn btn-default" />
+        </div>
+    </div>
+</div>
+}
+
+<div>
+    @Html.ActionLink("Back to Project", "Details", new { id = config.ProjectID })
+</div>
+
+
+@section Scripts{
+    <script src="~/Scripts/jquery.validate.min.js"></script>
+    <script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            var FieldNum = $('#FieldNum').val();
+
+            $('tbody').html("");
+            var tr = '<tr> <td> <input type="number" class="MaxChar" /></td> <td><input type="text" class="FieldNote" /></td> <td><input type="checkbox" class="CheckBox" /></td> <td><input type="checkbox" class="Alpha" /></td> <td><input type="checkbox" class="Num" /></td> <td><input type="checkbox" class="Dot" /></td> <td><input type="checkbox" class="Special" /></td> <td><input type="checkbox" class="Custom" /></td> <td><input type="checkbox" class="Abbr" /></td> </tr >';
+            for (var i = 0; i < FieldNum; i++) {
+                $('tbody').append(tr);
+            }
+            
+            var MaxChar = $('#MaxChar').val().split('|');
+            $('.MaxChar').each(function (i) {
+                $(this).val(MaxChar[i]);
+            });
+
+            var FieldNote = $('#FieldNote').val().split('|');
+            $('.FieldNote').each(function (i) {
+                $(this).val(FieldNote[i]);
+            });
+
+
+            var CheckBox = $('#CheckBox').val().split('|');
+            $('.CheckBox').each(function (i) {
+                if (CheckBox[i]=='1') {
+                    $(this).prop('checked', true);
+                }
+            });
+
+            var Alpha = $('#Alpha').val().split('|');
+            $('.Alpha').each(function (i) {
+                if (Alpha[i] == '1') {
+                    $(this).prop('checked', true);
+                }
+            });
+
+            var Num = $('#Num').val().split('|');
+            $('.Num').each(function (i) {
+                if (Num[i] == '1') {
+                    $(this).prop('checked', true);
+                }
+            });
+
+            var Dot = $('#Dot').val().split('|');
+            $('.Dot').each(function (i) {
+                if (Dot[i] == '1') {
+                    $(this).prop('checked', true);
+                }
+            });
+
+            var Special = $('#Special').val().split('|');
+            $('.Special').each(function (i) {
+                if (Special[i] == '1') {
+                    $(this).prop('checked', true);
+                }
+            });
+
+            var Custom = $('#Custom').val().split('|');
+            $('.Custom').each(function (i) {
+                if (Custom[i] == '1') {
+                    $(this).prop('checked', true);
+                }
+            });
+
+            var Abbr = $('#Abbr').val().split('|');
+            $('.Abbr').each(function (i) {
+                if (Abbr[i] == '1') {
+                    $(this).prop('checked', true);
+                }
+            });
+
+            $('#apply').click(function (e) {
+                e.preventDefault();
+                var FieldNum = $('#FieldNum').val();
+                if (FieldNum < 1) {
+                    alert('Please input greater more than 1');
+                }
+                $('tbody').html("");
+                var tr = '<tr> <td> <input type="number" class="MaxChar" /></td> <td><input type="text" class="FieldNote" /></td> <td><input type="checkbox" class="CheckBox" /></td> <td><input type="checkbox" class="Alpha" /></td> <td><input type="checkbox" class="Num" /></td> <td><input type="checkbox" class="Dot" /></td> <td><input type="checkbox" class="Special" /></td> <td><input type="checkbox" class="Custom" /></td> <td><input type="checkbox" class="Abbr" /></td> </tr >';
+                for (var i = 0; i < FieldNum; i++) {
+                    $('tbody').append(tr);
+                }
+            });
+            $('#create').click(function () {
+                var MaxChar = '';
+                $('.MaxChar').each(function () {
+                    MaxChar += $(this).val() + '|'
+                });
+
+                var FieldNote = '';
+                $('.FieldNote').each(function () {
+                    FieldNote += $(this).val() + '|'
+                });
+
+                var CheckBox = '';
+                $('.CheckBox').each(function () {
+                    var val = '0';
+                    if ($(this).prop('checked')) {
+                        val = '1';
+                    }
+                    CheckBox += val + '|'
+                });
+
+                var Alpha = '';
+                $('.Alpha').each(function () {
+                    var val = '0';
+                    if ($(this).prop('checked')) {
+                        val = '1';
+                    }
+                    Alpha += val + '|'
+                });
+
+                var Num = '';
+                $('.Num').each(function () {
+                    var val = '0';
+                    if ($(this).prop('checked')) {
+                        val = '1';
+                    }
+                    Num += val + '|'
+                });
+
+                var Dot = '';
+                $('.Dot').each(function () {
+                    var val = '0';
+                    if ($(this).prop('checked')) {
+                        val = '1';
+                    }
+                    Dot += val + '|'
+                });
+
+                var Special = '';
+                $('.Special').each(function () {
+                    var val = '0';
+                    if ($(this).prop('checked')) {
+                        val = '1';
+                    }
+                    Special += val + '|'
+                });
+
+                var Custom = '';
+                $('.Custom').each(function () {
+                    var val = '0';
+                    if ($(this).prop('checked')) {
+                        val = '1';
+                    }
+                    Custom += val + '|'
+                });
+
+                var Abbr = '';
+                $('.Abbr').each(function () {
+                    var val = '0';
+                    if ($(this).prop('checked')) {
+                        val = '1';
+                    }
+                    Abbr += val + '|'
+                });
+                MaxChar = MaxChar.slice(0, -1);
+                FieldNote = FieldNote.slice(0, -1);
+                CheckBox = CheckBox.slice(0, -1);
+                Alpha = Alpha.slice(0, -1);
+                Num = Num.slice(0, -1);
+                Dot = Dot.slice(0, -1);
+                Special = Special.slice(0, -1);
+                Custom = Custom.slice(0, -1);
+                Abbr = Abbr.slice(0, -1);
+
+                $('#MaxChar').val(MaxChar);
+                $('#FieldNote').val(FieldNote);
+                $('#CheckBox').val(CheckBox);
+                $('#Alpha').val(Alpha);
+                $('#Num').val(Num);
+                $('#Dot').val(Dot);
+                $('#Special').val(Special);
+                $('#Custom').val(Custom);
+                $('#Abbr').val(Abbr);
+            });
+        });
+    </script>
+}
+
+

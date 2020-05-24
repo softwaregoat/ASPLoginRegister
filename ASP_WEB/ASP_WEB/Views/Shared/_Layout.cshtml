@@ -1,0 +1,85 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - My ASP.NET Application</title>
+    <link href="~/Content/Site.css" rel="stylesheet" type="text/css" />
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <link href="~/Content/toastr.min.css" rel="stylesheet" type="text/css" />
+    <script src="~/Scripts/modernizr-2.8.3.js"></script>
+</head>
+<body>
+    <div class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container" style="width:100%!important;">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                @Html.ActionLink("Application name", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+            </div>
+            <div class="navbar-collapse collapse">
+                <!--Right Aligned Menu Start-->
+                <ul class="nav navbar-nav navbar-right">
+                    <!--dropdown Menu Start-->
+                    <li class="dropdown">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                            @{
+                                var user = HttpContext.Current.User.Identity.Name;
+                                var src = "/Content/User/" + user.Replace('@', '_') + ".jpg";
+
+                            }
+                            <img src="@src" alt="@user" width="30" height="30" style="border-radius:100px;" />
+                            <span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a href="@Url.Action("Details", "User")">View</a></li>
+                            <li><a href="@Url.Action("Edit", "User")">Edit</a></li>
+                            <li><a href="@Url.Action("Logout", "User")">Logout</a></li>
+                        </ul>
+                    </li>
+                    <!--dropdown Menu End-->
+                </ul>
+                <!--Right Aligned Menu End-->
+            </div>
+        </div>
+    </div>
+
+    <div id="wrapper" class="toggled">
+        <!-- Sidebar -->
+        <div id="sidebar-wrapper">
+            <ul class="sidebar-nav">
+                <li class="sidebar-brand"><a href="#">Start Bootstrap </a></li>
+                <li><a href="/">Dashboard</a> </li>
+                <li><a href="/User/List">Users</a> </li>
+                <li><a href="/Project">Projects</a> </li>
+            </ul>
+        </div>
+        <!-- /#sidebar-wrapper -->
+        <!-- Page Content -->
+        <div id="page-content-wrapper">
+            @RenderBody()
+            <hr />
+            <footer>
+                @*<a href="#ToggleSideMenu" class="btn btn-default" id="ToggleSideMenu">Side</a>*@
+                <p>&copy; @DateTime.Now.Year - My ASP.NET Application</p>
+            </footer>
+        </div>
+        <!-- /#page-content-wrapper -->
+    </div>
+    <script src="~/Scripts/jquery-3.4.1.min.js"></script>
+    <script src="~/Scripts/bootstrap.min.js"></script>
+    <script src="~/Scripts/toastr.min.js"></script>
+    @RenderSection("Scripts", false)
+    <script>
+        $(document).ready(function () {
+            $("#ToggleSideMenu").click(function (e) {
+                e.preventDefault();
+                $("#wrapper").toggleClass("toggled");
+            });
+        });
+    </script>
+</body>
+</html>

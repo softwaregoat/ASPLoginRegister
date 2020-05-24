@@ -1,0 +1,425 @@
+﻿@model ASP_WEB.Models.StartBatch
+@{
+    ViewBag.Title = "StartBatch";
+    ASP_WEB.Models.StartBatch startBatch = Model;
+    var imgName = Path.GetFileName(startBatch.Images[0]);
+}
+<link href="~/Content/imgAreaSelect/imgareaselect-animated.css" rel="stylesheet" />
+<link href="~/Content/imgAreaSelect/imgareaselect-default.css" rel="stylesheet" />
+<link href="~/Content/imgAreaSelect/imgareaselect-deprecated.css" rel="stylesheet" />
+<h2>StartBatch</h2>
+<hr />
+<style>
+    input[type="radio"] {
+        display: inline;
+        margin-bottom: 0px;
+    }
+
+    label > .label-body {
+        margin-left: .5rem;
+        font-weight: normal;
+    }
+
+    span {
+        position: absolute;
+        width: 100px;
+        left: 30px;
+    }
+</style>
+<form method="post" enctype="multipart/form-data">
+    @Html.ValidationSummary()
+    <div class="container" style="margin-bottom:10px;">
+        <div class="row">
+            <a href="@Url.Action("Details", "Project", new { id = startBatch.config.ProjectID })">@startBatch.ProjectName</a> /
+            <a href="@Url.Action("Details", "Batch", new { id = startBatch.BatchID })">@startBatch.BatchName</a> /
+            <a href="@startBatch.Images[0]" id="imgName">@imgName</a>
+        </div>
+
+        <div class="row table-bordered" style="margin-bottom:10px;">
+
+            <div class="col-md-2">
+                <label>
+                    <input type="radio" value="fitwd" name="fit" /><span class="label-body">Fit Window</span>
+                </label>
+            </div>
+            <div class="col-md-2">
+                <label>
+                    <input type="radio" value="fitw" name="fit" /><span class="label-body">Fit Width</span>
+                </label>
+            </div>
+            <div class="col-md-2">
+                <label>
+                    <input type="radio" value="fith" name="fit" /><span class="label-body">Fit Height</span>
+                </label>
+            </div>
+            <div class="col-md-2">
+                <label>
+                    <input type="radio" value="fitscale" name="fit" /><span class="label-body">Fit Scale</span>
+                </label>
+            </div>
+            <div class="col-md-2">
+                <input type="button" id="zoomin" value="Zoom In" />
+                <input type="button" id="zoomout" value="Zoom Out" />
+            </div>
+            <div class="col-md-2">
+                <span id="scale">1</span>
+            </div>
+        </div>
+        <div class="row" style="width:1000px;height:400px;overflow:auto;" id="imgview">
+            @for (int i = 0; i < startBatch.Images.Length; i++)
+            {
+                if (i == 0)
+                {
+                    <img class="ImgPreview" src="@startBatch.Images[i]" style="display:block;transform:scale(1);" />
+                }
+                else
+                {
+                    <img class="ImgPreview" src="@startBatch.Images[i]" style="display:none" />
+                }
+            }
+        </div>
+        <div class="row">
+            <a href="@Url.Action("Details", "Project", new { id = startBatch.config.ProjectID })">@startBatch.ProjectName</a> /
+            <a href="@Url.Action("Details", "Batch", new { id = startBatch.BatchID })">@startBatch.BatchName</a> 
+        </div>
+        <div class="row" style="width:1000px;height:300px;">
+            @for (int i = 0; i < startBatch.FieldNum; i++)
+            {
+                var FieldNote = startBatch.FieldNote[i];
+                var NoteName = FieldNote.Replace(' ', '_');
+                if (startBatch.CheckBox[i] == "1")
+                {
+
+                    <div class="col-md-6">
+                        <label>@FieldNote: </label>
+                        <input type="checkbox" id="@NoteName" class="form-control zoning" />
+                    </div>
+
+                }
+                else
+                {
+                    var max = startBatch.MaxChar[i];
+                    var Alpha = startBatch.Alpha[i];
+                    var Num = startBatch.Num[i];
+                    var Dot = startBatch.Dot[i];
+                    var Special = startBatch.Special[i];
+                    var Custom = startBatch.Custom[i];
+                    var Abbr = startBatch.Abbr[i];
+                    var FullView = startBatch.FullView != null ? startBatch.FullView[i] : "";
+                    var FieldView = startBatch.FieldView != null ? startBatch.FieldView[i] : "";
+
+
+                    <div class="col-sm-6">
+                        <label for="@NoteName">@FieldNote: </label>
+                        <input type="text" id="@NoteName" maxlength="@max"
+                               data-Alpha="@Alpha"
+                               data-Num="@Num"
+                               data-Dot="@Dot"
+                               data-Special="@Special"
+                               data-Custom="@Custom"
+                               data-Abbr="@Abbr"
+                               class="form-control zoning" value="@FullView" />
+                    </div>
+
+                }
+
+            }
+        </div>
+        <div class="row">
+            <div class="col-md-3">
+            </div>
+            <div class="col-md-2">
+                <input type="button" id="prev" class="btn btn-default" value="PREV" />
+            </div>
+            <div class="col-md-2">
+                <input type="button" id="stop" class="btn btn-default" value="STOP" />
+            </div>
+            <div class="col-md-2">
+                <input type="button" id="next" class="btn btn-default" value="NEXT" />
+            </div>
+            <div class="col-md-3">
+            </div>
+        </div>
+        <input type="hidden" value="@startBatch.config.ProjectID" id="ProjectID" />
+        <input type="hidden" value="@Request.Url.Segments.Last()" id="BatchID" />
+        <input type="hidden" value="" name="FullView" />
+        <input type="hidden" value="" name="FieldView" />
+    </div>
+    <button type="submit" id="update" class="btn btn-success">Submit</button>
+</form>
+<div>
+    @Html.ActionLink("Back to Project", "Details", new { id = startBatch.config.ProjectID })
+</div>
+@section Scripts{
+    <script src="~/Scripts/jquery.validate.min.js"></script>
+    <script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+    <script src="~/Scripts/imgAreaSelect/jquery.imgareaselect.min.js"></script>
+    <script src="~/Scripts/imgAreaSelect/jquery.imgareaselect.pack.js"></script>
+    <script>
+        $(document).keypress(function (e) {
+            if (e.keyCode == 110) {
+                $('#next').click();
+            }
+            if (e.which == 112) {
+                $('#prev').click();
+            }
+        });
+        $(document).ready(function () {
+            var id = $('#BatchID').val();
+            var index = 0;
+            var count = $('#imgview img').length;
+            $('#next').click(function (e) {
+                var img = $('#imgview img')[index];
+                $(img).css('display', 'none');
+                if (index < count - 1) {
+                    index += 1;
+                    img = $('#imgview img')[index];
+                    $(img).css('display', 'block');
+                } else {
+                    img = $('#imgview img')[0];
+                    $(img).css('display', 'block');
+                    index = 0;
+                }
+                var src = $(img).attr('src');
+                $('#imgName').attr('href', src);
+                var fileNameIndex = src.lastIndexOf("/") + 1;
+                var filename = src.substr(fileNameIndex);
+                $('#imgName').text(filename);
+            });
+            $('#prev').click(function (e) {
+                var img = $('#imgview img')[index];
+                $(img).css('display', 'none');
+                if (index > 0) {
+                    index -= 1;
+                    img = $('#imgview img')[index];
+                    $(img).css('display', 'block');
+                } else {
+                    index = count - 1;
+                    img = $('#imgview img')[index];
+                    $(img).css('display', 'block');
+                }
+                var src = $(img).attr('src');
+                $('#imgName').attr('href', src);
+                var fileNameIndex = src.lastIndexOf("/") + 1;
+                var filename = src.substr(fileNameIndex);
+                $('#imgName').text(filename);
+            });
+            $('#zoomin').click(function () {
+                var img = $('#imgview img')[index];
+                var scale = parseFloat($('#scale').text());
+                scale = scale + scale * 15 / 100;
+                $(img).css('transform', 'scale(' + scale + ')');
+                $('#scale').text(scale)
+            });
+            $('#zoomout').click(function () {
+                var img = $('#imgview img')[index];
+                var scale = parseFloat($('#scale').text());
+                scale = scale - scale * 15 / 100;
+                $(img).css('transform', 'scale(' + scale + ')');
+                $('#scale').text(scale)
+            });
+            $('input[name="fit"]').click(function () {
+                var v = $(this).val();
+                if (v == 'fitwd') {
+                    $('#imgview img').css("width", '1000px');
+                    $('#imgview img').css('height', '400px');
+                } else if (v == 'fitw') {
+                    $('#imgview img').css("width", '1000px');
+                } else if (v == 'fith') {
+                    $('#imgview img').css('height', '400px');
+                }
+                else if (v == 'fitscale') {
+
+                    //$('#imgview img').css('height', '400px');
+                }
+            });
+
+            //$('.ImgPreview').imgAreaSelect({
+            //    handles: true,
+            //    onSelectEnd: function (img, selection) {
+            //        if (!selection.width || !selection.height) {
+            //            return;
+            //        }
+            //        //$('#x').val(selection.x1);
+            //        //$('#y').val(selection.y1);
+            //        //$('#w').val(selection.width);
+            //        //$('#h').val(selection.height);
+            //    }
+            //});
+
+            $('#setFull').click(function (e) {
+                e.preventDefault();
+                var v = $('#x').val() + ',' +
+                    $('#y').val() + ',' +
+                    $('#w').val() + ',' +
+                    $('#h').val();
+                var field = $('#fieldSet').val();
+                $('#' + field).val(v);
+            });
+            $('#setField').click(function (e) {
+                e.preventDefault();
+                var v = $('#x').val() + ',' +
+                    $('#y').val() + ',' +
+                    $('#w').val() + ',' +
+                    $('#h').val();
+                var field = $('#fieldSet').val();
+                $('#' + field + '-1').val(v);
+            });
+            $('#update').click(function () {
+                var full = '';
+                $('input.zoning').each(function (i, em) {
+                    full += $(this).val() + '|';
+                });
+                var field = '';
+                $('input.zoning-1').each(function (i, em) {
+                    field += $(this).val() + '|';
+                });
+                field = field.slice(0, -1);
+                full = full.slice(0, -1);
+                $('input[name="FullView"]').val(full);
+                $('input[name="FieldView"]').val(field);
+            });
+            $('input[type="text"]').keyup(function () {
+                var alpha = $(this).data('alpha');
+                var num = $(this).data('num');
+                var dot = $(this).data('dot');
+                var special = $(this).data('special');
+                var custom = $(this).data('custom');
+                var abbr = $(this).data('abbr');
+                var v = $(this).val();
+
+                var reg = /[a-zA-Z]/;
+                if (alpha == '0') {
+                    if (checkValid(v, reg)) {
+                        toastr.warning('Dont input Alphabet');
+                        return;
+                    }
+                }
+
+                reg = /[0-9]/;
+                if (num == '0') {
+                    if (checkValid(v, reg)) {
+                        toastr.warning('Dont input Number');
+                        return;
+                    }
+                }
+                reg = /[.,\/]/;
+                if (dot == '0') {
+                    if (checkValid(v, reg)) {
+                        toastr.warning('Dont input (.,/)');
+                        return;
+                    }
+                }
+                reg = /[^\w\*]/;
+                if (special == '0') {
+                    if (checkValid(v, reg)) {
+                        toastr.warning('Dont input special charater');
+                        return;
+                    }
+                }
+                //reg = /[.,\/]/;
+                //if (custom == '0') {
+                //    if (checkValid(v, reg)) {
+                //        alert('Dont input custom charater');
+                //        return;
+                //    }
+                //}
+
+                //reg = /[.,\/]/;
+                //if (abbr == '0') {
+                //    if (checkValid(v, reg)) {
+                //        alert('Dont input abbr charater');
+                //        return;
+                //    }
+                //}
+            });
+            $('input#start').click(function () {
+                var data = JSON.stringify({
+                    'id': id
+                });
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("StartBatch")',
+                    data: data,
+                    success: function (response) {
+                        toastr.success(response);
+                    },
+                    contentType: 'application/json'
+                });
+            });
+            $('input#stop').click(function () {
+                var data = JSON.stringify({
+                    'id': id
+                });
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("StopBatch")',
+                    data: data,
+                    success: function (response) {
+                        toastr.success(response);
+                    },
+                    contentType: 'application/json'
+                });
+            });
+            $('input#resume').click(function () {
+                var data = JSON.stringify({
+                    'id': id
+                });
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("ResumeBatch")',
+                    data: data,
+                    success: function (response) {
+                        toastr.success(response);
+                    },
+                    contentType: 'application/json'
+                });
+            });
+            $('input#verify').click(function () {
+                var data = JSON.stringify({
+                    'id': id
+                });
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("VerifyBatch")',
+                    data: data,
+                    success: function (response) {
+                        toastr.success(response);
+                    },
+                    contentType: 'application/json'
+                });
+            });
+            $('input#correct').click(function () {
+                var data = JSON.stringify({
+                    'id': id
+                });
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("CorrectBatch")',
+                    data: data,
+                    success: function (response) {
+                        alert(response);
+                    },
+                    contentType: 'application/json'
+                });
+            });
+        });
+
+        function checkValid(v, reg) {
+            if (reg.test(v) == false) {
+                return false;
+            }
+            return true;
+        }
+        function ImgPre(input) {
+            if (input.files[0]) {
+                var uploadimg = new FileReader();
+                uploadimg.onload = function (displayimg) {
+                    $("#ImgPreview").attr('src', displayimg.target.result);
+                }
+                uploadimg.readAsDataURL(input.files[0]);
+            }
+        }
+
+    </script>
+}
