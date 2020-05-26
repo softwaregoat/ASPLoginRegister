@@ -28,5 +28,6 @@ namespace ASP_WEB.Models
         public string Abbr { get; set; }
         public string FullView { get; set; }
         public string FieldView { get; set; }
+        public string FieldName { get; set; }
     }
 }

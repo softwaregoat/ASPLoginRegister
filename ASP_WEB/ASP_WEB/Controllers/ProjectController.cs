@@ -52,7 +52,141 @@ namespace ASP_WEB.Controllers
         {
             return RedirectToAction("Delete", "Batch", new { id = id });
         }
+        // GET: Project/Report/5
+        public ActionResult Report(int id)
+        {
+            using (MyDatabaseEntities de = new MyDatabaseEntities())
+            {
+                var batchs = de.Batches.Where(a => a.ProjectID == id).ToList();
+                return View(batchs);
+            }
+        }
+        // POST: Project/Report/5
+        [HttpPost]
+        public ActionResult Report(List<int> batchIDs)
+        {
+            if (batchIDs == null)
+            {
+                return Json("Failed to export");
+            }
+            using (MyDatabaseEntities de = new MyDatabaseEntities())
+            {
+                var batchDatas = de.BatchDatas.Where(c => batchIDs.Contains((int)c.BatchID)).ToList();
+                if (batchDatas == null)
+                {
+                    return Json("Failed to export: There is no any Batch Data");
+                }
+                var filename = DateTime.Now.ToString("MM-dd-yyyy H-mm") + ".txt";
+                using (System.IO.StreamWriter file =
+            new System.IO.StreamWriter(Server.MapPath("/Content/Report/" + filename), true))
+                {
+                    string str = "Operator\t#Batches\t#Records\tttl keys\tttl time\tRecord/hr\theys/hr";
+                    file.WriteLine(str);
+                    var opt = GetCurrentUserName();
+                    var batchID = 0;
+                    int batches = 0;
+                    var keys = 0;
+                    var time = 0;
+                    var records = 0;
+                    foreach (var b in batchDatas)
+                    {
+                        records++;
+                        if (batchID!=b.BatchID)
+                        {
+                            batches++;
+                            batchID = (int)b.BatchID;
+                        }
+                        var ttl_keys = b.Data.Length - b.Data.Split('|').Length - 1;
+                        keys+=ttl_keys;
+                        var ttl_time = b.SpentTime;
+                        time += (int)ttl_time;
+                    }
+                    var r_hr = TimeSpan.FromSeconds(time).TotalHours;
+                    var k_hr = keys / r_hr;
 
+                    str = string.Format("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}", opt, batches, records, keys, time, r_hr, k_hr );
+                    file.WriteLine(str);
+
+                }
+                return Json("SUCCESS to export");
+
+            }
+        }
+        // GET: Project/Export/5
+        public ActionResult Export(int id)
+        {
+            using (MyDatabaseEntities de = new MyDatabaseEntities())
+            {
+                var batchs = de.Batches.Where(a => a.ProjectID == id).ToList();
+                return View(batchs);
+            }
+        }
+        // POST: Project/Export/5
+        [HttpPost]
+        public ActionResult Export(List<int> batchIDs, string delimiter = ",", bool opt = true)
+        {
+            if (batchIDs==null)
+            {
+                return Json("Failed to export");
+            }
+            using (MyDatabaseEntities de = new MyDatabaseEntities())
+            {
+                var batchDatas = de.BatchDatas.Where(c => batchIDs.Contains((int)c.BatchID)).ToList();
+                if (batchDatas==null)
+                {
+                    return Json("Failed to export: There is no any Batch Data");
+                }
+                var ProjectID = batchDatas[0].ProjectID;
+                var config = de.Configs.Where(c => c.ProjectID==ProjectID).FirstOrDefault();
+                var fields = config.FieldName.Split('|');
+                string header = "";
+                var count = config.FieldNum;
+                foreach (var f in fields)
+                {
+                    header += f + delimiter;
+                }
+                header += "BatchID" + delimiter + "RecordID" + delimiter + "Operator";
+                var filename = DateTime.Now.ToString("MM-dd-yyyy H-mm") + ".txt";
+                using (System.IO.StreamWriter file =
+            new System.IO.StreamWriter(Server.MapPath("/Content/Export/" + filename), true))
+                {
+
+                    file.WriteLine(header);
+
+                    foreach (var b in batchDatas)
+                    {
+                        var data = b.Data.Split('|');
+                        string str = "";
+                        foreach (var f in data)
+                        {
+                            str += f + delimiter;
+                        }
+                        if (opt)
+                        {
+                            var opts = GetCurrentUserName();
+                            str += b.BatchID + delimiter + b.RecordID + delimiter + opts;
+                        }
+                        else
+                        {
+                            str += b.BatchID + delimiter + b.RecordID;
+                        }
+                        file.WriteLine(str);
+                    }
+                }
+                return Json("SUCCESS to export");
+
+            }
+        }
+        [NonAction]
+        public string GetCurrentUserName()
+        {
+            var email = HttpContext.User.Identity.Name;
+            using (MyDatabaseEntities de = new MyDatabaseEntities())
+            {
+                var user = de.Users.Where(c => email == email).FirstOrDefault();
+                return user.FirstName + " " + user.LastName;
+            }
+        }
         // GET: Project/CreateBatch
         public ActionResult CreateBatch(int id)
         {
@@ -64,15 +198,21 @@ namespace ASP_WEB.Controllers
             using (MyDatabaseEntities de = new MyDatabaseEntities())
             {
                 var batch = de.Batches.Where(a => a.BatchID == id).FirstOrDefault();
-                batch.Timer = 0;
-                de.SaveChanges();
+                //batch.Timer = 0;
+                //de.SaveChanges();
                 var config = de.Configs.Where(a => a.ProjectID == batch.ProjectID).FirstOrDefault();
                 StartBatch start = new StartBatch();
                 start.config = config;
                 start.Populate();
-                start.GetProjectName();
                 start.BatchName = batch.BatchName;
                 start.BatchID = batch.BatchID;
+                start.GetProjectName();
+                var batchData = de.BatchDatas.Where(a => a.ProjectID == start.config.ProjectID && a.BatchID == start.BatchID && a.RecordID == 0).FirstOrDefault();
+                if (batchData!=null)
+                {
+                    start.batchData = batchData;
+                    start.BatchFields = start.GetData(batchData.Data);
+                }
                 var path = Path.Combine(Server.MapPath("~/Content/Projects/" + batch.ProjectID + "/" + id));
                 bool exists = System.IO.Directory.Exists(path);
                 if (exists)
@@ -89,17 +229,61 @@ namespace ASP_WEB.Controllers
             }
         }
         [HttpPost]
-        public ActionResult StartBatch()
+        public ActionResult SaveBatchData(BatchData batchData)
         {
-            int id = Convert.ToInt32(Request.Url.Segments.Last());
             using (MyDatabaseEntities de = new MyDatabaseEntities())
             {
-                var batch = de.Batches.Where(a => a.BatchID == id).FirstOrDefault();
-                batch.Timer = 0;
+                var batchData1 = de.BatchDatas.Where(a => (a.RecordID == batchData.RecordID &&
+                    a.BatchID == batchData.BatchID &&
+                    a.ProjectID == batchData.ProjectID)).FirstOrDefault();
+                if (batchData1!=null)
+                {
+                    TempData["Batch-" + batchData1.BatchID] = DateTime.Now;
+                    return Json("Already exits BatchData. ID : " + batchData1.DataID);
+                }
+                
+                batchData.CompleteTime = DateTime.Now;
+                int Timer = 0;
+                DateTime data = (DateTime)TempData["Batch-" + batchData.BatchID];
+                if (data != null)
+                {
+                    Timer = (int)((TimeSpan)(batchData.CompleteTime - data)).TotalSeconds;
+                }
+                batchData.SpentTime = Timer;
+                batchData = de.BatchDatas.Add(batchData);
+                
                 de.SaveChanges();
             }
-            TempData["Batch-" + id] = DateTime.Now;
-            return Json("SUCCESS to Start");
+            TempData["Batch-" + batchData.BatchID] = DateTime.Now;
+            return Json("SUCCESS to Save BatchData. ID : " + batchData.DataID);
+        }
+        [HttpPost]
+        public ActionResult UpdateBatchData(BatchData batchData)
+        {
+            using (MyDatabaseEntities de = new MyDatabaseEntities())
+            {
+                if (batchData.DataID > 0)
+                {
+                    var batchData1 = de.BatchDatas.Where(a => (a.RecordID == batchData.RecordID &&
+                        a.BatchID == batchData.BatchID &&
+                        a.ProjectID == batchData.ProjectID)).FirstOrDefault();
+                    if (batchData1 != null)
+                    {
+                        batchData1.Data = batchData.Data;
+                        batchData1.CompleteTime = DateTime.Now;
+                        int Timer = 0;
+                        DateTime data = (DateTime)TempData["Batch-" + batchData.BatchID];
+                        if (data != null)
+                        {
+                            Timer = (int)((TimeSpan)(batchData1.CompleteTime - data)).TotalSeconds;
+                        }
+                        batchData1.SpentTime += Timer;
+                    }
+                }
+                de.SaveChanges();
+                TempData["Batch-" + batchData.BatchID] = DateTime.Now;
+                return Json("SUCCESS to Update BatchData. ID : " + batchData.DataID);
+            }
         }
         [HttpPost]
         public ActionResult StopBatch(int id)
@@ -251,6 +435,7 @@ namespace ASP_WEB.Controllers
                     con.Custom = config.Custom;
                     con.Abbr = config.Abbr;
                     con.FieldNum = config.FieldNum;
+                    con.FieldName = config.FieldName;
                 }
                 else
                 {
@@ -299,6 +484,7 @@ namespace ASP_WEB.Controllers
                         using (MyDatabaseEntities de = new MyDatabaseEntities())
                         {
                             de.Batches.Add(batch);
+                            de.SaveChanges();
                         }
 
                         //string[] lines = System.IO.File.ReadAllLines(uploadpath);

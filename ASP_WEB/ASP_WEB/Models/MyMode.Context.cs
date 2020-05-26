@@ -30,5 +30,6 @@ namespace ASP_WEB.Models
         public virtual DbSet<Config> Configs { get; set; }
         public virtual DbSet<Project> Projects { get; set; }
         public virtual DbSet<User> Users { get; set; }
+        public virtual DbSet<BatchData> BatchDatas { get; set; }
     }
 }

@@ -27,6 +27,7 @@
     <table class="table table-bordered">
         <thead>
             <tr>
+                <th>FieldName</th>
                 <th>MaxChar</th>
                 <th>FieldNote</th>
                 <th>IsCheckBox</th>
@@ -41,6 +42,7 @@
         <tbody>
         </tbody>
     </table>
+    <input type="hidden" id="FieldName" name="FieldName" value="@config.FieldName"/>
     <input type="hidden" id="MaxChar" name="MaxChar" value="@config.MaxChar"/>
     <input type="hidden" id="FieldNote" name="FieldNote" value="@config.FieldNote"/>
     <input type="hidden" id="CheckBox" name="CheckBox" value="@config.CheckBox"/>
@@ -69,13 +71,16 @@
     <script type="text/javascript">
         $(document).ready(function () {
             var FieldNum = $('#FieldNum').val();
-
             $('tbody').html("");
-            var tr = '<tr> <td> <input type="number" class="MaxChar" /></td> <td><input type="text" class="FieldNote" /></td> <td><input type="checkbox" class="CheckBox" /></td> <td><input type="checkbox" class="Alpha" /></td> <td><input type="checkbox" class="Num" /></td> <td><input type="checkbox" class="Dot" /></td> <td><input type="checkbox" class="Special" /></td> <td><input type="checkbox" class="Custom" /></td> <td><input type="checkbox" class="Abbr" /></td> </tr >';
+            var tr = '<tr><td><input type="text" class="FieldName" /></td><td> <input type="number" class="MaxChar" /></td> <td><input type="text" class="FieldNote" /></td> <td><input type="checkbox" class="CheckBox" /></td> <td><input type="checkbox" class="Alpha" /></td> <td><input type="checkbox" class="Num" /></td> <td><input type="checkbox" class="Dot" /></td> <td><input type="checkbox" class="Special" /></td> <td><input type="text" class="Custom" /></td> <td><input type="checkbox" class="Abbr" /></td> </tr >';
             for (var i = 0; i < FieldNum; i++) {
                 $('tbody').append(tr);
             }
-            
+            var FieldName = $('#FieldName').val().split('|');
+            $('.FieldName').each(function (i) {
+                $(this).val(FieldName[i]);
+            });
+
             var MaxChar = $('#MaxChar').val().split('|');
             $('.MaxChar').each(function (i) {
                 $(this).val(MaxChar[i]);
@@ -124,9 +129,7 @@
 
             var Custom = $('#Custom').val().split('|');
             $('.Custom').each(function (i) {
-                if (Custom[i] == '1') {
-                    $(this).prop('checked', true);
-                }
+                $(this).val(Custom[i]);
             });
 
             var Abbr = $('#Abbr').val().split('|');
@@ -143,7 +146,7 @@
                     alert('Please input greater more than 1');
                 }
                 $('tbody').html("");
-                var tr = '<tr> <td> <input type="number" class="MaxChar" /></td> <td><input type="text" class="FieldNote" /></td> <td><input type="checkbox" class="CheckBox" /></td> <td><input type="checkbox" class="Alpha" /></td> <td><input type="checkbox" class="Num" /></td> <td><input type="checkbox" class="Dot" /></td> <td><input type="checkbox" class="Special" /></td> <td><input type="checkbox" class="Custom" /></td> <td><input type="checkbox" class="Abbr" /></td> </tr >';
+                var tr = '<tr><td><input type="text" class="FieldName" /></td> <td> <input type="number" class="MaxChar" /></td> <td><input type="text" class="FieldNote" /></td> <td><input type="checkbox" class="CheckBox" /></td> <td><input type="checkbox" class="Alpha" /></td> <td><input type="checkbox" class="Num" /></td> <td><input type="checkbox" class="Dot" /></td> <td><input type="checkbox" class="Special" /></td> <td><input type="text" class="Custom" /></td> <td><input type="checkbox" class="Abbr" /></td> </tr >';
                 for (var i = 0; i < FieldNum; i++) {
                     $('tbody').append(tr);
                 }
@@ -152,6 +155,11 @@
                 var MaxChar = '';
                 $('.MaxChar').each(function () {
                     MaxChar += $(this).val() + '|'
+                });
+
+                var FieldName = '';
+                $('.FieldName').each(function () {
+                    FieldName += $(this).val() + '|'
                 });
 
                 var FieldNote = '';
@@ -206,11 +214,7 @@
 
                 var Custom = '';
                 $('.Custom').each(function () {
-                    var val = '0';
-                    if ($(this).prop('checked')) {
-                        val = '1';
-                    }
-                    Custom += val + '|'
+                    Custom += $(this).val() + '|'
                 });
 
                 var Abbr = '';
@@ -222,6 +226,7 @@
                     Abbr += val + '|'
                 });
                 MaxChar = MaxChar.slice(0, -1);
+                FieldName = FieldName.slice(0, -1);
                 FieldNote = FieldNote.slice(0, -1);
                 CheckBox = CheckBox.slice(0, -1);
                 Alpha = Alpha.slice(0, -1);
@@ -231,6 +236,7 @@
                 Custom = Custom.slice(0, -1);
                 Abbr = Abbr.slice(0, -1);
 
+                $('#FieldName').val(FieldName);
                 $('#MaxChar').val(MaxChar);
                 $('#FieldNote').val(FieldNote);
                 $('#CheckBox').val(CheckBox);

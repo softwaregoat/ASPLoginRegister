@@ -17,27 +17,27 @@
                 <select id="fieldSet" class="form-control">
                     @for (int i = 0; i < zoning.FieldNum; i++)
                     {
-                        var FieldNote = zoning.FieldNote[i];
-                        var NoteName = FieldNote.Replace(' ', '_');
-                        <option value="@NoteName">@FieldNote</option>
+                        var FieldName = zoning.FieldName[i];
+                        var FieldName1 = FieldName.Replace(' ', '_');
+                        <option value="@FieldName">@FieldName1</option>
                     }
                 </select>
                 <div class="row">
                     @for (int i = 0; i < zoning.FieldNum; i++)
                     {
-                        var FieldNote = zoning.FieldNote[i];
-                        var NoteName = FieldNote.Replace(' ', '_');
+                        var FieldName = zoning.FieldName[i];
+                        var FieldName1 = FieldName.Replace(' ', '_');
                         if (zoning.CheckBox[i] == "1")
                         {
                             <div class="form-group">
                                 <div class="row">
                                     <div class="col-md-6">
-                                        <label>@FieldNote: </label>
-                                        <input type="checkbox" id="@NoteName" class="form-control zoning" />
+                                        <label>@FieldName: </label>
+                                        <input type="checkbox" id="@FieldName1" class="form-control zoning" />
                                     </div>
                                     <div class="col-md-6">
-                                        <label>@FieldNote-1: </label>
-                                        <input type="checkbox" id="@NoteName-1" class="form-control zoning-1" />
+                                        <label>@FieldName-1: </label>
+                                        <input type="checkbox" id="@FieldName1-1" class="form-control zoning-1" />
                                     </div>
                                 </div>
                                 
@@ -57,8 +57,8 @@
 
                             <div class="row">
                                 <div class="col-sm-6">
-                                    <label for="@NoteName">@FieldNote: </label>
-                                    <input type="text" id="@NoteName" maxlength="@max"
+                                    <label for="@FieldName1">@FieldName: </label>
+                                    <input type="text" id="@FieldName1" maxlength="@max"
                                            data-Alpha="@Alpha"
                                            data-Num="@Num"
                                            data-Dot="@Dot"
@@ -68,8 +68,8 @@
                                            class="form-control zoning" value="@FullView"/>
                                 </div>
                                 <div class="col-sm-6">
-                                    <label>@FieldNote-1: </label>
-                                    <input type="text" id="@NoteName-1" maxlength="@max"
+                                    <label>@FieldName-1: </label>
+                                    <input type="text" id="@FieldName1-1" maxlength="@max"
                                            data-Alpha="@Alpha"
                                            data-Num="@Num"
                                            data-Dot="@Dot"

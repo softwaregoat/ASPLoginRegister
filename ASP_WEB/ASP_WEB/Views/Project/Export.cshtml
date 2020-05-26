@@ -1,0 +1,111 @@
+﻿@model IEnumerable<ASP_WEB.Models.Batch>
+
+@{
+    ViewBag.Title = "Export";
+    var batchs = Model;
+}
+    <h2>Export</h2>
+    <hr />
+    <div class="container">
+
+        <div class="row">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>
+                            <input type="checkbox" name="checkAll" id="checkAll" />Check box
+                        </th>
+                        <th>
+                            Batch Name
+                        </th>
+                    </tr>
+                </thead>
+                @foreach (var item in batchs)
+                {
+                    <tbody>
+                        <tr data-id="@item.BatchID">
+                            <td>
+                                <input type="checkbox" class="checkbox" />
+                            </td>
+                            <td>
+                                @item.BatchName
+                            </td>
+                        </tr>
+                    </tbody>
+
+                }
+            </table>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4">
+                <span>Delimiter to use:</span>
+            </div>
+            <div class="col-md-4">
+                <input type="text" id="delimiter" value="" class="form-control" />
+            </div>
+            <div class="col-md-4">
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <span>Include Operator Name?:</span>
+            </div>
+            <div class="col-md-4">
+                <input type="checkbox" id="operator" />
+            </div>
+            <div class="col-md-4">
+            </div>
+             
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+            </div>
+            <div class="col-md-4">
+                <input type="button" class="form-control" id="export" value="EXPORT" />
+            </div>
+            <div class="col-md-4">
+
+            </div>
+            
+        </div>
+    </div>
+    @section Scripts{
+        <script src="~/Scripts/jquery.validate.min.js"></script>
+        <script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+        <script>
+            $(document).ready(function () {
+                $('#checkAll').click(function () {
+                    $('.checkbox').each(function (i, em) {
+                        $(this).prop('checked', true);
+                    });
+                });
+                $('#export').click(function () {
+                    var batchIDs = [];
+                    $('tbody tr').each(function (i, em) {
+                        if ($(this).find('.checkbox').prop('checked')) {
+                            batchIDs.push($(this).data('id'));
+                        }
+                    });
+
+                    var delimiter = $('#delimiter').val();
+                    var opt = $('#operator').prop('checked');
+                    var data = JSON.stringify({
+                        'batchIDs': batchIDs,
+                        'delimiter': delimiter,
+                        'opt': opt
+                    });
+                    $.ajax({
+                        type: "POST",
+                        url: '@Url.Action("Export")',
+                        data: data,
+                        success: function (response) {
+                            toastr.success(response);
+                        },
+                        contentType: 'application/json'
+                    });
+                });
+            });
+        </script>
+    }

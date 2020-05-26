@@ -18,6 +18,19 @@
           <Property Name="Timer" Type="int" />
           <Property Name="ProjectID" Type="int" Nullable="false" />
         </EntityType>
+        <EntityType Name="BatchData">
+          <Key>
+            <PropertyRef Name="DataID" />
+          </Key>
+          <Property Name="DataID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="ProjectID" Type="int" />
+          <Property Name="BatchID" Type="int" />
+          <Property Name="RecordID" Type="int" />
+          <Property Name="ImageName" Type="nvarchar" MaxLength="200" />
+          <Property Name="SpentTime" Type="int" />
+          <Property Name="CompleteTime" Type="datetime" />
+          <Property Name="Data" Type="nvarchar(max)" />
+        </EntityType>
         <EntityType Name="Company">
           <Key>
             <PropertyRef Name="CompanyID" />
@@ -43,6 +56,7 @@
           <Property Name="Abbr" Type="nvarchar" MaxLength="150" />
           <Property Name="FullView" Type="nvarchar(max)" />
           <Property Name="FieldView" Type="nvarchar(max)" />
+          <Property Name="FieldName" Type="nvarchar(max)" />
         </EntityType>
         <EntityType Name="Project">
           <Key>
@@ -72,6 +86,7 @@
         </EntityType>
         <EntityContainer Name="DatabaseModelStoreContainer">
           <EntitySet Name="Batch" EntityType="Self.Batch" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="BatchData" EntityType="Self.BatchData" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Company" EntityType="Self.Company" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Config" EntityType="Self.Config" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Project" EntityType="Self.Project" Schema="dbo" store:Type="Tables" />
@@ -119,6 +134,7 @@
           <Property Name="Abbr" Type="String" MaxLength="150" FixedLength="false" Unicode="true" />
           <Property Name="FullView" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="FieldView" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="FieldName" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
         </EntityType>
         <EntityType Name="Project">
           <Key>
@@ -152,7 +168,21 @@
           <EntitySet Name="Configs" EntityType="Self.Config" />
           <EntitySet Name="Projects" EntityType="Self.Project" />
           <EntitySet Name="Users" EntityType="Self.User" />
+          <EntitySet Name="BatchDatas" EntityType="DatabaseModel.BatchData" />
         </EntityContainer>
+        <EntityType Name="BatchData">
+          <Key>
+            <PropertyRef Name="DataID" />
+          </Key>
+          <Property Name="DataID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ProjectID" Type="Int32" />
+          <Property Name="BatchID" Type="Int32" />
+          <Property Name="RecordID" Type="Int32" />
+          <Property Name="ImageName" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="SpentTime" Type="Int32" />
+          <Property Name="CompleteTime" Type="DateTime" Precision="3" />
+          <Property Name="Data" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+        </EntityType>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -184,6 +214,7 @@
           <EntitySetMapping Name="Configs">
             <EntityTypeMapping TypeName="DatabaseModel.Config">
               <MappingFragment StoreEntitySet="Config">
+                <ScalarProperty Name="FieldName" ColumnName="FieldName" />
                 <ScalarProperty Name="FieldView" ColumnName="FieldView" />
                 <ScalarProperty Name="FullView" ColumnName="FullView" />
                 <ScalarProperty Name="ConfigID" ColumnName="ConfigID" />
@@ -226,6 +257,20 @@
                 <ScalarProperty Name="ActivationCode" ColumnName="ActivationCode" />
                 <ScalarProperty Name="SecurityLevel" ColumnName="SecurityLevel" />
                 <ScalarProperty Name="Activate" ColumnName="Activate" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="BatchDatas">
+            <EntityTypeMapping TypeName="DatabaseModel.BatchData">
+              <MappingFragment StoreEntitySet="BatchData">
+                <ScalarProperty Name="Data" ColumnName="Data" />
+                <ScalarProperty Name="CompleteTime" ColumnName="CompleteTime" />
+                <ScalarProperty Name="SpentTime" ColumnName="SpentTime" />
+                <ScalarProperty Name="ImageName" ColumnName="ImageName" />
+                <ScalarProperty Name="RecordID" ColumnName="RecordID" />
+                <ScalarProperty Name="BatchID" ColumnName="BatchID" />
+                <ScalarProperty Name="ProjectID" ColumnName="ProjectID" />
+                <ScalarProperty Name="DataID" ColumnName="DataID" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

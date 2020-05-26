@@ -189,6 +189,8 @@
     <Content Include="Views\Project\UploadImage.cshtml" />
     <Content Include="Views\Project\ZONING.cshtml" />
     <Content Include="Views\Project\StartBatch.cshtml" />
+    <Content Include="Views\Project\Export.cshtml" />
+    <Content Include="Views\Project\Report.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\RouteConfig.cs" />
@@ -203,6 +205,10 @@
     <Compile Include="Models\Batch.cs">
       <DependentUpon>MyMode.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\BatchData.cs">
+      <DependentUpon>MyMode.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Export.cs" />
     <Compile Include="Models\StartBatch.cs" />
     <Compile Include="Models\Zoning.cs" />
     <Compile Include="Models\Company.cs">
@@ -253,8 +259,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Content\Export\" />
     <Folder Include="Content\Image\" />
     <Folder Include="Content\Projects\" />
+    <Folder Include="Content\Report\" />
     <Folder Include="Content\UploadBatch\" />
     <Folder Include="Content\User\" />
   </ItemGroup>

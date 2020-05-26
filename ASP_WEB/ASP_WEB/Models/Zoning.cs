@@ -25,6 +25,7 @@ namespace ASP_WEB.Models
             this.Special =  GetData(config.Special);
             this.Custom =  GetData(config.Custom);
             this.Abbr =  GetData(config.Abbr);
+            this.FieldName =  GetData(config.FieldName);
             this.FullView = config.FullView!=null?GetData(config.FullView):null;
             this.FieldView = config.FieldView!=null?GetData(config.FieldView):null;
         }
@@ -40,6 +41,7 @@ namespace ASP_WEB.Models
         public string[] Special { get; set; }
         public string[] Custom { get; set; }
         public string[] Abbr { get; set; }
+        public string[] FieldName { get; set; }
         public string ZoningFile { get; set; }
 
     }

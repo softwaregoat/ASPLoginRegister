@@ -13,6 +13,19 @@
     <Property Name="Timer" Type="int" />
     <Property Name="ProjectID" Type="int" Nullable="false" />
   </EntityType>
+  <EntityType Name="BatchData">
+    <Key>
+      <PropertyRef Name="DataID" />
+    </Key>
+    <Property Name="DataID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="ProjectID" Type="int" />
+    <Property Name="BatchID" Type="int" />
+    <Property Name="RecordID" Type="int" />
+    <Property Name="ImageName" Type="nvarchar" MaxLength="200" />
+    <Property Name="SpentTime" Type="int" />
+    <Property Name="CompleteTime" Type="datetime" />
+    <Property Name="Data" Type="nvarchar(max)" />
+  </EntityType>
   <EntityType Name="Company">
     <Key>
       <PropertyRef Name="CompanyID" />
@@ -38,6 +51,7 @@
     <Property Name="Abbr" Type="nvarchar" MaxLength="150" />
     <Property Name="FullView" Type="nvarchar(max)" />
     <Property Name="FieldView" Type="nvarchar(max)" />
+    <Property Name="FieldName" Type="nvarchar(max)" />
   </EntityType>
   <EntityType Name="Project">
     <Key>
@@ -67,6 +81,7 @@
   </EntityType>
   <EntityContainer Name="DatabaseModelStoreContainer">
     <EntitySet Name="Batch" EntityType="Self.Batch" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="BatchData" EntityType="Self.BatchData" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="Company" EntityType="Self.Company" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="Config" EntityType="Self.Config" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="Project" EntityType="Self.Project" Schema="dbo" store:Type="Tables" />

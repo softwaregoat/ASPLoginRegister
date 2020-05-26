@@ -26,6 +26,7 @@
     <EntitySetMapping Name="Configs">
       <EntityTypeMapping TypeName="DatabaseModel.Config">
         <MappingFragment StoreEntitySet="Config">
+          <ScalarProperty Name="FieldName" ColumnName="FieldName" />
           <ScalarProperty Name="FieldView" ColumnName="FieldView" />
           <ScalarProperty Name="FullView" ColumnName="FullView" />
           <ScalarProperty Name="ConfigID" ColumnName="ConfigID" />
@@ -68,6 +69,20 @@
           <ScalarProperty Name="ActivationCode" ColumnName="ActivationCode" />
           <ScalarProperty Name="SecurityLevel" ColumnName="SecurityLevel" />
           <ScalarProperty Name="Activate" ColumnName="Activate" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="BatchDatas">
+      <EntityTypeMapping TypeName="DatabaseModel.BatchData">
+        <MappingFragment StoreEntitySet="BatchData">
+          <ScalarProperty Name="Data" ColumnName="Data" />
+          <ScalarProperty Name="CompleteTime" ColumnName="CompleteTime" />
+          <ScalarProperty Name="SpentTime" ColumnName="SpentTime" />
+          <ScalarProperty Name="ImageName" ColumnName="ImageName" />
+          <ScalarProperty Name="RecordID" ColumnName="RecordID" />
+          <ScalarProperty Name="BatchID" ColumnName="BatchID" />
+          <ScalarProperty Name="ProjectID" ColumnName="ProjectID" />
+          <ScalarProperty Name="DataID" ColumnName="DataID" />
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>

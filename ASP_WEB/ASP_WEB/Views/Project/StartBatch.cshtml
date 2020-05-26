@@ -80,19 +80,25 @@
         </div>
         <div class="row">
             <a href="@Url.Action("Details", "Project", new { id = startBatch.config.ProjectID })">@startBatch.ProjectName</a> /
-            <a href="@Url.Action("Details", "Batch", new { id = startBatch.BatchID })">@startBatch.BatchName</a> 
+            <a href="@Url.Action("Details", "Batch", new { id = startBatch.BatchID })">@startBatch.BatchName</a> /
+            <a href="#" id="RecordID">0</a>
         </div>
         <div class="row" style="width:1000px;height:300px;">
             @for (int i = 0; i < startBatch.FieldNum; i++)
             {
-                var FieldNote = startBatch.FieldNote[i];
+                string last = "";
+                if (i==startBatch.FieldNum-1)
+                {
+                    last = "last";
+                }
+                var FieldNote = startBatch.FieldName[i];
                 var NoteName = FieldNote.Replace(' ', '_');
                 if (startBatch.CheckBox[i] == "1")
                 {
 
                     <div class="col-md-6">
                         <label>@FieldNote: </label>
-                        <input type="checkbox" id="@NoteName" class="form-control zoning" />
+                        <input type="checkbox" id="@NoteName" class="form-control zoning @last" />
                     </div>
 
                 }
@@ -105,8 +111,7 @@
                     var Special = startBatch.Special[i];
                     var Custom = startBatch.Custom[i];
                     var Abbr = startBatch.Abbr[i];
-                    var FullView = startBatch.FullView != null ? startBatch.FullView[i] : "";
-                    var FieldView = startBatch.FieldView != null ? startBatch.FieldView[i] : "";
+                    var BatchFields = startBatch.batchData.Data!= null ? startBatch.BatchFields[i] : "";
 
 
                     <div class="col-sm-6">
@@ -118,7 +123,7 @@
                                data-Special="@Special"
                                data-Custom="@Custom"
                                data-Abbr="@Abbr"
-                               class="form-control zoning" value="@FullView" />
+                               class="form-control zoning @last" value="@BatchFields" />
                     </div>
 
                 }
@@ -138,16 +143,17 @@
                 <input type="button" id="next" class="btn btn-default" value="NEXT" />
             </div>
             <div class="col-md-3">
+                <input type="button" id="update" class="btn btn-default" value="UPDATE" />
             </div>
         </div>
         <input type="hidden" value="@startBatch.config.ProjectID" id="ProjectID" />
+        <input type="hidden" value="@startBatch.batchData.DataID" id="DataID" />
         <input type="hidden" value="@Request.Url.Segments.Last()" id="BatchID" />
         <input type="hidden" value="" name="FullView" />
         <input type="hidden" value="" name="FieldView" />
     </div>
-    <button type="submit" id="update" class="btn btn-success">Submit</button>
 </form>
-<div>
+<div id="return-back">
     @Html.ActionLink("Back to Project", "Details", new { id = startBatch.config.ProjectID })
 </div>
 @section Scripts{
@@ -165,11 +171,52 @@
             }
         });
         $(document).ready(function () {
+            $('input.zoning.last').keypress(function (e) {
+                if (e.keyCode == 13) {
+                    $('#next').click();
+                }
+            });
             var id = $('#BatchID').val();
+            var ProjectID = $('#ProjectID').val();
+            var DataID = $('#DataID').val();
             var index = 0;
             var count = $('#imgview img').length;
             $('#next').click(function (e) {
+                if (index == count - 1) {
+                    var r = confirm("Are you sure to finish?");
+                    if (r) {
+                        location.href = $('#return-back > a').attr('href');
+                        return;
+                    }
+                }
                 var img = $('#imgview img')[index];
+                var src = $(img).attr('src');
+                var fileNameIndex = src.lastIndexOf("/") + 1;
+                var filename = src.substr(fileNameIndex);
+
+                var fieldData = '';
+                $('input.zoning').each(function () {
+                    fieldData += $(this).val() + '|';
+                });
+                fieldData = fieldData.slice(0, -1);
+
+                var data = JSON.stringify({
+                    'BatchID': id,
+                    'RecordID': index,
+                    'ImageName': filename,
+                    'Data': fieldData,
+                    'ProjectID': ProjectID,
+                    'DataID': DataID
+                });
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("SaveBatchData")',
+                    data: data,
+                    success: function (response) {
+                        toastr.success(response);
+                    },
+                    contentType: 'application/json'
+                });
                 $(img).css('display', 'none');
                 if (index < count - 1) {
                     index += 1;
@@ -185,6 +232,10 @@
                 var fileNameIndex = src.lastIndexOf("/") + 1;
                 var filename = src.substr(fileNameIndex);
                 $('#imgName').text(filename);
+                $('input.zoning').each(function () {
+                    $(this).val('');
+                });
+                $('#RecordID').text(index);
             });
             $('#prev').click(function (e) {
                 var img = $('#imgview img')[index];
@@ -203,6 +254,36 @@
                 var fileNameIndex = src.lastIndexOf("/") + 1;
                 var filename = src.substr(fileNameIndex);
                 $('#imgName').text(filename);
+                $('#RecordID').text(index);
+            });
+            $('#update').click(function (e) {
+                var img = $('#imgview img')[index];
+                var src = $(img).attr('src');
+                var fileNameIndex = src.lastIndexOf("/") + 1;
+                var filename = src.substr(fileNameIndex);
+                var fieldData = '';
+                $('input.zoning').each(function () {
+                    fieldData += $(this).val() + '|';
+                });
+                fieldData = fieldData.slice(0, -1);
+                var data = JSON.stringify({
+                    'BatchID': id,
+                    'RecordID': index,
+                    'ImageName': filename,
+                    'Data': fieldData,
+                    'ProjectID': ProjectID,
+                    'DataID': DataID
+                });
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("UpdateBatchData")',
+                    data: data,
+                    success: function (response) {
+                        toastr.success(response);
+                    },
+                    contentType: 'application/json'
+                });
+
             });
             $('#zoomin').click(function () {
                 var img = $('#imgview img')[index];
@@ -246,25 +327,6 @@
             //        //$('#h').val(selection.height);
             //    }
             //});
-
-            $('#setFull').click(function (e) {
-                e.preventDefault();
-                var v = $('#x').val() + ',' +
-                    $('#y').val() + ',' +
-                    $('#w').val() + ',' +
-                    $('#h').val();
-                var field = $('#fieldSet').val();
-                $('#' + field).val(v);
-            });
-            $('#setField').click(function (e) {
-                e.preventDefault();
-                var v = $('#x').val() + ',' +
-                    $('#y').val() + ',' +
-                    $('#w').val() + ',' +
-                    $('#h').val();
-                var field = $('#fieldSet').val();
-                $('#' + field + '-1').val(v);
-            });
             $('#update').click(function () {
                 var full = '';
                 $('input.zoning').each(function (i, em) {
@@ -317,14 +379,10 @@
                         return;
                     }
                 }
-                //reg = /[.,\/]/;
-                //if (custom == '0') {
-                //    if (checkValid(v, reg)) {
-                //        alert('Dont input custom charater');
-                //        return;
-                //    }
-                //}
-
+                if ($(this).val().includes(custom)) {
+                    toastr.warning('Dont input ' + custom);
+                    return;
+                }
                 //reg = /[.,\/]/;
                 //if (abbr == '0') {
                 //    if (checkValid(v, reg)) {

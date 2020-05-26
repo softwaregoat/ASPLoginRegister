@@ -10,7 +10,9 @@
     @Html.ActionLink("Upload Batch", "UploadBatch", new { id = Request.Url.Segments.Last() }) |
     @Html.ActionLink("Upload Image", "UploadImage", new { id = Request.Url.Segments.Last() }) |
     @Html.ActionLink("Edit Config", "Config", new { id = Request.Url.Segments.Last() }) |
-    @Html.ActionLink("Edit ZONING", "ZONING", new { id = Request.Url.Segments.Last() })
+    @Html.ActionLink("Edit ZONING", "ZONING", new { id = Request.Url.Segments.Last() }) |
+    @Html.ActionLink("Export", "Export", new { id = Request.Url.Segments.Last() }) |
+    @Html.ActionLink("Reports", "Report", new { id = Request.Url.Segments.Last() })
 </p>
 <div class="container" style="margin:10px;">
     <div class="row right">
@@ -77,8 +79,8 @@
     <td>
         @Html.ActionLink("START", "StartBatch", new { id = item.BatchID }) |
         @Html.ActionLink("STOP", "StartBatch", new { id = item.BatchID }) |
-        @Html.ActionLink("RESUME", "StartBatch", new { id = item.BatchID })
-        @Html.ActionLink("VERIFY", "StartBatch", new { id = item.BatchID })
+        @Html.ActionLink("RESUME", "StartBatch", new { id = item.BatchID }) |
+        @Html.ActionLink("VERIFY", "StartBatch", new { id = item.BatchID }) |
         @Html.ActionLink("CORRECT", "StartBatch", new { id = item.BatchID })
     </td>
 

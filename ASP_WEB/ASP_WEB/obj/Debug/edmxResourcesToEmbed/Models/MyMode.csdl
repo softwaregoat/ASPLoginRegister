@@ -38,6 +38,7 @@
     <Property Name="Abbr" Type="String" MaxLength="150" FixedLength="false" Unicode="true" />
     <Property Name="FullView" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
     <Property Name="FieldView" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+    <Property Name="FieldName" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
   </EntityType>
   <EntityType Name="Project">
     <Key>
@@ -71,5 +72,19 @@
     <EntitySet Name="Configs" EntityType="Self.Config" />
     <EntitySet Name="Projects" EntityType="Self.Project" />
     <EntitySet Name="Users" EntityType="Self.User" />
+    <EntitySet Name="BatchDatas" EntityType="DatabaseModel.BatchData" />
   </EntityContainer>
+  <EntityType Name="BatchData">
+    <Key>
+      <PropertyRef Name="DataID" />
+    </Key>
+    <Property Name="DataID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="ProjectID" Type="Int32" />
+    <Property Name="BatchID" Type="Int32" />
+    <Property Name="RecordID" Type="Int32" />
+    <Property Name="ImageName" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Name="SpentTime" Type="Int32" />
+    <Property Name="CompleteTime" Type="DateTime" Precision="3" />
+    <Property Name="Data" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+  </EntityType>
 </Schema>

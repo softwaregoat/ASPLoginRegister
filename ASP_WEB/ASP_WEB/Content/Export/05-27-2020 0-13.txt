@@ -1,0 +1,4 @@
+First#Last#BatchID#RecordID#Operator
+aaa#bbbr#26#0#First1 Last1
+ggg#ggg#26#2#First1 Last1
+##26#1#First1 Last1
